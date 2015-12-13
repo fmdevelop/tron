@@ -84,13 +84,17 @@ void Game::doStep()
 
     int snakesAlive = 0;
 
-    while (iterator != m_gameState->snakes.constEnd()) {
-        if (!iterator->isAlive)
+    while (iterator != m_gameState->snakes.end()) {
+        if (!iterator->isAlive) {
+            ++iterator;
             continue;
+        }
 
         ++snakesAlive;
 
         handleSnakeStep(*iterator);
+
+        ++iterator;
     }
 
     if (m_gameState->status == data::RUNNING && snakesAlive <= 1) {
@@ -119,6 +123,7 @@ void Game::roundFinished()
             // there should be only one
             break;
         }
+        ++iterator;
     }
 
     m_gameState->status = data::SHOWING_RESULTS;
@@ -127,7 +132,7 @@ void Game::roundFinished()
 
 void Game::startRound()
 {
-    m_initialGameStateGenerator->cleanupGameStateForNewRound(m_gameState.take(), m_field);
+    m_initialGameStateGenerator->cleanupGameStateForNewRound(m_gameState.data(), m_field);
 
     fillGameMatrix();
 
@@ -138,15 +143,15 @@ void Game::startRound()
 
 void Game::fireGameStateChanged()
 {
-    emit gamestateChanged(m_gameState.take());
+    emit gamestateChanged(m_gameState.data());
 }
 
 void Game::fillGameMatrix()
 {
     data::Field f = m_field;
 
-    for (int i = 0; i < f.width; ++i)
-        for (int j = 0; j < f.height; ++j)
+    for (int i = 0; i < f.height; ++i)
+        for (int j = 0; j < f.width; ++j)
             (*m_gameMatrix)[i][j] = EMPTY;
 
     QMap<uint, data::Snake>::const_iterator iterator = m_gameState->snakes.constBegin();
@@ -167,6 +172,8 @@ void Game::fillGameMatrix()
         } else {
             fillGameMatrixColumn(start.y, start.x, end.x, id);
         }
+
+        ++iterator;
     }
 
     foreach(const data::Border& b, f.borders) {
@@ -192,17 +199,19 @@ void Game::fillGameMatrixColumn(uint column, uint from, uint to, int value)
 
 void Game::startGame(const data::InitObject &initObjectgameState) {
     Q_ASSERT_X(initObjectgameState.snakeNames.count() > 0, "startGame", "No snakes to start a game");
-    Q_ASSERT_X(initObjectgameState.field.width > 0, "startGame", "Invalid field width");
-    Q_ASSERT_X(initObjectgameState.field.height > 0, "startGame", "Invalid field height");
+    Q_ASSERT_X(initObjectgameState.fieldSize.width() > 0, "startGame", "Invalid field width");
+    Q_ASSERT_X(initObjectgameState.fieldSize.height() > 0, "startGame", "Invalid field height");
 
-    m_field = initObjectgameState.field;
+
+
+    m_field = m_initialGameStateGenerator->createGameField(initObjectgameState.fieldSize);
     data::GameState* gameState = m_initialGameStateGenerator->createInitialGameState(initObjectgameState);
     m_gameState.reset(gameState);
 
     // initialize GameMatrix
     QVector<QVector<int> >* vec = new QVector<QVector<int> >(m_field.height);
     for (int i = 0; i < vec->length(); ++i)
-        (*vec)[i].resize(initObjectgameState.field.width);
+        (*vec)[i].resize(m_field.width);
     m_gameMatrix.reset(vec);
 
     emit gameFieldInitialized(&m_field);

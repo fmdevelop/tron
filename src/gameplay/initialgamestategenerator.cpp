@@ -9,6 +9,22 @@ InitialGameStateGenerator::InitialGameStateGenerator()
 
 }
 
+data::Field InitialGameStateGenerator::createGameField(const QSize &fieldSize)
+{
+    data::Field field;
+    field.width = fieldSize.width();
+    field.height = fieldSize.height();
+    field.backgroundColor = tron::BACKGROUND_COLOR;
+
+    data::Border border1, border2;
+    border1.color = border2.color = tron::BORDER_COLOR;
+    border1.offset = 3;
+    border2.offset = 6;
+
+    field.borders << border1 << border2;
+    return field;
+}
+
 data::GameState *InitialGameStateGenerator::createInitialGameState(const data::InitObject &initObject)
 {
     data::GameState* gameState = new data::GameState();
@@ -25,9 +41,9 @@ data::GameState *InitialGameStateGenerator::createInitialGameState(const data::I
         gameState->snakes[snakeId].name = *iterator;
         gameState->snakes[snakeId].color = tron::STANDARD_SNAKE_COLORS[snakeId];
         gameState->snakes[snakeId].score = 0;
+        ++iterator;
     }
 
-    // cleanupGameStateForNewRound(gameState, initObject.field);
     return gameState;
 }
 
@@ -60,8 +76,8 @@ void InitialGameStateGenerator::cleanupGameStateForNewRound(data::GameState *gam
             // left -> right
             iterator->direction = data::Direction::RIGHT;
 
-            first.x = field.width/6*5;
-            second.x = field.width/3*2;
+            first.x = field.width/6;
+            second.x = field.width/3;
 
             first.y = second.y = field.height/(numVertical+1)*(randomStartPositionId+1);
 
@@ -69,8 +85,8 @@ void InitialGameStateGenerator::cleanupGameStateForNewRound(data::GameState *gam
             // right -> left
             iterator->direction = data::Direction::LEFT;
 
-            first.x = field.width/6;
-            second.x = field.width/3;
+            first.x = field.width/6*5;
+            second.x = field.width/3*2;
 
             int verticalPositionId = randomStartPositionId - numVertical;
 
@@ -82,6 +98,6 @@ void InitialGameStateGenerator::cleanupGameStateForNewRound(data::GameState *gam
 
         iterator->points << first << second;
 
-
+        ++iterator;
     }
 }

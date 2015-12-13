@@ -28,11 +28,15 @@ struct Snake
      */
     inline bool directionHasChanged()
     {
+        // for UP, DOWN direction the x coordinate has to be the same,
+        // for LEFT, RIGHT direction the y coordinate has to be the same
+
         if (direction == Direction::UP || direction == Direction::DOWN)
-            return points.last().y != points[points.count() - 2].y;
+            return points.last().x != points[points.count() - 2].x;
 
         // LEFT, RIGHT
-        return points.last().x != points[points.count() - 2].x;
+        return points.last().y != points[points.count() - 2].y;
+
     }
 
     inline Point getNextPosition() {

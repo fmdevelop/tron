@@ -17,7 +17,8 @@ SOURCES += src/main.cpp\
     src/gameplay/initialgamestategenerator.cpp \
     src/constants.cpp \
     src/rendering/openglwindow.cpp \
-    src/mainwindow.cpp
+    src/mainwindow.cpp \
+    src/rendering/trongamewindow.cpp
 
 HEADERS  += \
     src/data/data.h \
@@ -31,7 +32,8 @@ HEADERS  += \
     src/data/initobject.h \
     src/gameplay/initialgamestategenerator.h \
     src/rendering/openglwindow.h \
-    src/mainwindow.h
+    src/mainwindow.h \
+    src/rendering/trongamewindow.h
 
 FORMS    += \
     src/mainwindow.ui

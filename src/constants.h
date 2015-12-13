@@ -21,6 +21,8 @@ const uint SCORE_COLLISSION = 1;
 
 // LOOK
 extern const QColor STANDARD_SNAKE_COLORS[];
+const QColor BORDER_COLOR(Qt::darkGray);
+const QColor BACKGROUND_COLOR(Qt::black);
 
 
 }

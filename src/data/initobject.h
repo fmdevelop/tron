@@ -3,12 +3,13 @@
 
 #include "field.h"
 #include <QSet>
+#include <QSize>
 
 namespace tron {
 namespace data {
 
 struct InitObject {
-    Field field;
+    QSize fieldSize;
     QSet<QString> snakeNames;
 };
 
