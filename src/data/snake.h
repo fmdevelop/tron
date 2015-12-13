@@ -47,13 +47,13 @@ struct Snake
             ++nextPos.x;
             break;
         case Direction::UP:
-            ++nextPos.y;
+            --nextPos.y; // origin TOP left (!)
             break;
         case Direction::LEFT:
             --nextPos.x;
             break;
         case Direction::DOWN:
-            --nextPos.y;
+            ++nextPos.y;
             break;
         }
         return nextPos;

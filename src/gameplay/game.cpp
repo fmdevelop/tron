@@ -51,6 +51,7 @@ void Game::handleSnakeStep(data::Snake& snake)
         } else {
             snake.points.last() = nextPos;
         }
+        (*m_gameMatrix)[nextPos.x][nextPos.y] = snake.id;
         return;
     }
 
@@ -80,6 +81,9 @@ void Game::handleSnakeStep(data::Snake& snake)
 
 void Game::doStep()
 {
+    if (m_gameState->status == data::ROUND_ABOUT_TO_START)
+        m_gameState->status = data::RUNNING;
+
     QMap<uint, data::Snake>::iterator iterator = m_gameState->snakes.begin();
 
     int snakesAlive = 0;
@@ -100,10 +104,10 @@ void Game::doStep()
     if (m_gameState->status == data::RUNNING && snakesAlive <= 1) {
         m_gameState->status = data::ROUND_FINISHING;
 
-        uint msecToProceed = MSEC_TO_FINISH_ONE_PLAYER_ALIVE;
+        uint msecToProceed = tron::MSEC_TO_FINISH_ONE_PLAYER_ALIVE;
 
         if (snakesAlive == 0) {
-            msecToProceed = MSEC_TO_FINISH_ALL_PLAYERS_DEAD;
+            msecToProceed = tron::MSEC_TO_FINISH_ALL_PLAYERS_DEAD;
             m_gameIntervalTimer->stop();
         }
 
@@ -117,7 +121,7 @@ void Game::roundFinished()
 {
     QMap<uint, data::Snake>::iterator iterator = m_gameState->snakes.begin();
 
-    while (iterator != m_gameState->snakes.constEnd()) {
+    while (iterator != m_gameState->snakes.end()) {
         if (iterator->isAlive) {
             iterator->score += SCORE_SURVIVAL;
             // there should be only one
@@ -150,9 +154,9 @@ void Game::fillGameMatrix()
 {
     data::Field f = m_field;
 
-    for (int i = 0; i < f.height; ++i)
-        for (int j = 0; j < f.width; ++j)
-            (*m_gameMatrix)[i][j] = EMPTY;
+    for (int x = 0; x < f.width; ++x)
+        for (int y = 0; y < f.height; ++y)
+            (*m_gameMatrix)[x][y] = EMPTY;
 
     QMap<uint, data::Snake>::const_iterator iterator = m_gameState->snakes.constBegin();
 
@@ -186,14 +190,14 @@ void Game::fillGameMatrix()
 
 void Game::fillGameMatrixRow(uint row, uint from, uint to, int value)
 {
-    for (uint j = from; j <= to; ++j)
-        (*m_gameMatrix)[row][j] = value;
+    for (uint x = from; x <= to; ++x)
+        (*m_gameMatrix)[x][row] = value;
 }
 
 void Game::fillGameMatrixColumn(uint column, uint from, uint to, int value)
 {
-    for (uint i = from; i <= to; ++i)
-        (*m_gameMatrix)[i][column] = value;
+    for (uint y = from; y <= to; ++y)
+        (*m_gameMatrix)[column][y] = value;
 }
 
 
@@ -202,16 +206,15 @@ void Game::startGame(const data::InitObject &initObjectgameState) {
     Q_ASSERT_X(initObjectgameState.fieldSize.width() > 0, "startGame", "Invalid field width");
     Q_ASSERT_X(initObjectgameState.fieldSize.height() > 0, "startGame", "Invalid field height");
 
-
-
     m_field = m_initialGameStateGenerator->createGameField(initObjectgameState.fieldSize);
     data::GameState* gameState = m_initialGameStateGenerator->createInitialGameState(initObjectgameState);
     m_gameState.reset(gameState);
 
     // initialize GameMatrix
-    QVector<QVector<int> >* vec = new QVector<QVector<int> >(m_field.height);
-    for (int i = 0; i < vec->length(); ++i)
-        (*vec)[i].resize(m_field.width);
+    // vector of columns
+    QVector<QVector<int> >* vec = new QVector<QVector<int> >(m_field.width);
+    for (int x = 0; x < vec->length(); ++x)
+        (*vec)[x].resize(m_field.height);
     m_gameMatrix.reset(vec);
 
     emit gameFieldInitialized(&m_field);

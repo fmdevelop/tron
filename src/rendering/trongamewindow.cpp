@@ -56,7 +56,7 @@ void TronGameWindow::render()
         QMap<uint, data::Snake>::const_iterator iterator = m_pGameState->snakes.constBegin();
         while (iterator != m_pGameState->snakes.constEnd()) {
             renderSnakeName(*iterator);
-            renderSnake(*iterator);
+            renderLastSegmentOfSnake(*iterator);
             ++iterator;
         }
         return;
@@ -65,7 +65,7 @@ void TronGameWindow::render()
     if (m_pGameState->status == tron::data::RUNNING || m_pGameState->status == tron::data::ROUND_FINISHING) {
         QMap<uint, data::Snake>::const_iterator iterator = m_pGameState->snakes.constBegin();
         while (iterator != m_pGameState->snakes.constEnd()) {
-            renderSnake(*iterator);
+            renderLastSegmentOfSnake(*iterator);
             ++iterator;
         }
         return;
@@ -79,12 +79,14 @@ void TronGameWindow::render()
     glVertex2i(0, 0);
     glVertex2i(width(), height());
     glEnd();*/
+
+
 }
 
 void TronGameWindow::on_gamestateChanged(const tron::data::GameState *newGameState)
 {
     m_pGameState = newGameState;
-    renderNow();
+    this->requestUpdate();
 }
 
 void TronGameWindow::drawBorder(const tron::data::Border &border)
@@ -104,18 +106,22 @@ void TronGameWindow::drawBorder(const tron::data::Border &border)
 
 void TronGameWindow::renderSnakeName(const tron::data::Snake &snake)
 {
-    // TODO
+
 }
 
-void TronGameWindow::renderSnake(const tron::data::Snake &snake)
+void TronGameWindow::renderLastSegmentOfSnake(const tron::data::Snake &snake)
 {
     glLineWidth(1);
     glColor3f(snake.color.redF(),
               snake.color.greenF(),
               snake.color.blueF());
     glBegin(GL_LINE_STRIP);
+
+    glVertex2i(snake.points[snake.points.size()-2].x, snake.points[snake.points.size()-2].y);
+    glVertex2i(snake.points.last().x, snake.points.last().y);
+    /*
     foreach (const data::Point& p, snake.points) {
         glVertex2i(p.x, p.y);
-    }
+    }*/
     glEnd();
 }

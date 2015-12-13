@@ -10,7 +10,7 @@ namespace tron{
 const uint MSEC_TO_START = 2500;
 const uint MSEC_TO_FINISH_ONE_PLAYER_ALIVE = 2500;
 const uint MSEC_TO_FINISH_ALL_PLAYERS_DEAD = 1500;
-const uint MSEC_GAME_INTERVAL = 80;
+const uint MSEC_GAME_INTERVAL = 15;
 
 // SCORE
 const uint SCORE_ESCAPE = 5;
