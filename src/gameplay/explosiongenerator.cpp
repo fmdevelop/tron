@@ -41,7 +41,7 @@ void ExplosionGenerator::explode(const data::Field& field, const tron::data::Poi
             if (step > radius)
                 continue;
 
-            if (step == generateRandomIntInRange(0, step)) {
+            if (generateRandomIntInRange(0, step*step/4) < 3) {
                 data::Point p;
                 p.x = x;
                 p.y = y;

@@ -92,9 +92,15 @@ void TronGameWindow::render()
     }
 }
 
-//#include <QDebug>
+#include <QDebug>
 void TronGameWindow::on_gamestateChanged(QSharedPointer<data::GameState> newGameState)
 {
+    static data::Status status = data::ROUND_FINISHED;
+    if (status != newGameState->status) {
+        status = newGameState->status;
+        qDebug() << status;
+    }
+
     //qDebug() << "game state changed!!!";
     m_pGameState = newGameState;
     this->requestUpdate();

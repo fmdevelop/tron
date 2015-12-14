@@ -24,6 +24,7 @@ public:
 
 signals:
     void gameStart(const tron::data::InitObject&);
+    void anyKeyPressed();
 
 protected:
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;

@@ -2,6 +2,7 @@
 #include "../constants.h"
 #include <QtGlobal>
 #include <QMutexLocker>
+#include <QDebug>
 
 using namespace tron::gameplay;
 
@@ -15,11 +16,15 @@ Game::Game(InitialGameStateGenerator *initialGameStateGenerator, QObject *parent
 {
     moveToThread(&m_thread);
     m_explosionGenerator.reset(new ExplosionGenerator());
+    m_startGameTimer->setSingleShot(true);
+    m_finishingGameTimer->setSingleShot(true);
+    m_showingScoreTimer->setSingleShot(true);
     m_gameIntervalTimer->setInterval(tron::MSEC_GAME_INTERVAL);
     connect(m_startGameTimer, SIGNAL(timeout()), m_gameIntervalTimer, SLOT(start()));
     connect(m_gameIntervalTimer, SIGNAL(timeout()), this, SLOT(doStep()));
     connect(m_finishingGameTimer, SIGNAL(timeout()), m_gameIntervalTimer, SLOT(stop()));
     connect(m_finishingGameTimer, SIGNAL(timeout()), this, SLOT(roundFinished()));
+    connect(m_showingScoreTimer, SIGNAL(timeout()), this, SLOT(showingScoreTimerFinished()));
     m_thread.start();
 }
 
@@ -120,8 +125,10 @@ void Game::handleSnakeStep(data::Snake& snake)
 
 void Game::doStep()
 {
-    if (m_gameState->status == data::ROUND_ABOUT_TO_START)
+    if (m_gameState->status == data::ROUND_ABOUT_TO_START) {
+        qDebug() << "Changing gamestate to RUNNING in doStep()";
         m_gameState->status = data::RUNNING;
+    }
 
     QMap<uint, data::Snake>::iterator iterator = m_gameState->snakes.begin();
 
@@ -141,6 +148,7 @@ void Game::doStep()
     }
 
     if (m_gameState->status == data::RUNNING && snakesAlive <= 1) {
+        qDebug() << "Changing gamestate to ROUND_FINISHING in doStep() cause no more snake is alive";
         m_gameState->status = data::ROUND_FINISHING;
 
         uint msecToProceed = tron::MSEC_TO_FINISH_ONE_PLAYER_ALIVE;
@@ -180,6 +188,7 @@ void Game::roundFinished()
         ++iterator;
     }
 
+    qDebug() << "Changing GAME state to SHOWING RESULTS in roundFinished()";
     m_gameState->status = data::SHOWING_RESULTS;
     fireGameStateChanged();
     m_waitAfterShowingScore = true;
@@ -189,6 +198,9 @@ void Game::roundFinished()
 void Game::startRound()
 {
     m_initialGameStateGenerator->cleanupGameStateForNewRound(m_gameState.data(), m_field);
+
+    qDebug() << "Changing game state to ROUND_ABOUT_TO_START in startRound()";
+    m_gameState->status = data::ROUND_ABOUT_TO_START;
 
     fillGameMatrix();
 

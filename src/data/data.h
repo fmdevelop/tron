@@ -34,11 +34,11 @@ enum DirectionChange {
 }
 
 enum Status {
-    ROUND_ABOUT_TO_START,
-    RUNNING,
-    ROUND_FINISHING,
-    ROUND_FINISHED,
-    SHOWING_RESULTS
+    ROUND_ABOUT_TO_START, // 0
+    RUNNING, // 1
+    ROUND_FINISHING, // 2
+    ROUND_FINISHED, // 3
+    SHOWING_RESULTS // 4
 };
 
 }

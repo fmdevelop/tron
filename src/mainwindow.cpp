@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     connect(this, SIGNAL(gameStart(const tron::data::InitObject&)), m_pGame.data(), SLOT(startGame(const tron::data::InitObject&)));
+    connect(this, SIGNAL(anyKeyPressed()), m_pGame.data(), SLOT(continueWithNextRound()));
     connect(m_pGame.data(), SIGNAL(gameFieldInitialized(const data::Field*)), this, SLOT(on_gameFieldInitialized(const data::Field*)));
 }
 
@@ -61,7 +62,7 @@ void MainWindow::on_gameFieldInitialized(const data::Field *field)
 
 void MainWindow::on_keyPressed(QKeyEvent *event)
 {
-    m_pGame->continueWithNextRound();
+    emit anyKeyPressed();
 
     switch (event->key()) {
     case Qt::Key_Left:
