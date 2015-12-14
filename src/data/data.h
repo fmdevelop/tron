@@ -11,6 +11,9 @@ struct Point {
     int y;
 };
 
+
+uint qHash(const Point &point);
+
 inline bool operator==(const Point& lhs, const Point& rhs){ return lhs.x == rhs.x && lhs.y == lhs.y; }
 inline bool operator!=(const Point& lhs, const Point& rhs){return !(lhs == rhs);}
 

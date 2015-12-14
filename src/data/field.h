@@ -14,6 +14,7 @@ struct Field {
     int width;
     int height;
     QColor backgroundColor;
+    QColor explosionColor;
     QList<Border> borders;
 };
 

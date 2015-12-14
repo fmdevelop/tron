@@ -1,5 +1,6 @@
 #include "initialgamestategenerator.h"
 #include "../constants.h"
+#include "../utilities.h"
 
 using namespace tron;
 using namespace tron::gameplay;
@@ -15,6 +16,7 @@ data::Field InitialGameStateGenerator::createGameField(const QSize &fieldSize)
     field.width = fieldSize.width();
     field.height = fieldSize.height();
     field.backgroundColor = tron::BACKGROUND_COLOR;
+    field.explosionColor = tron::EXPLOSION_COLOR;
 
     data::Border border1, border2;
     border1.color = border2.color = tron::BORDER_COLOR;
@@ -49,7 +51,7 @@ data::GameState *InitialGameStateGenerator::createInitialGameState(const data::I
 
 void InitialGameStateGenerator::cleanupGameStateForNewRound(data::GameState *gameState, const data::Field &field)
 {
-    gameState->explosions.clear();
+    gameState->explodedPoints.clear();
     gameState->status = data::ROUND_ABOUT_TO_START;
 
     const int n = gameState->snakes.count();
@@ -65,7 +67,7 @@ void InitialGameStateGenerator::cleanupGameStateForNewRound(data::GameState *gam
 
         iterator->isAlive = true;
 
-        int randomStartPositionId = startPositionIds.takeAt((uint) qrand() / (((uint) RAND_MAX + 1) / (uint)startPositionIds.length()));
+        int randomStartPositionId = startPositionIds.takeAt(generateRandomIntInRange(0, startPositionIds.length()-1));
 
         int numVertical = (n+1)/2;
 

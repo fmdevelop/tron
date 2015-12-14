@@ -12,6 +12,7 @@ Game::Game(InitialGameStateGenerator *initialGameStateGenerator, QObject *parent
   , m_gameIntervalTimer(new QTimer(this))
   , m_initialGameStateGenerator(initialGameStateGenerator)
 {
+    m_explosionGenerator.reset(new ExplosionGenerator());
     m_gameIntervalTimer->setInterval(tron::MSEC_GAME_INTERVAL);
     connect(m_startGameTimer, SIGNAL(timeout()), m_gameIntervalTimer, SLOT(start()));
     connect(m_gameIntervalTimer, SIGNAL(timeout()), this, SLOT(doStep()));
@@ -51,6 +52,7 @@ void Game::handleSnakeStep(data::Snake& snake)
         } else {
             snake.points.last() = nextPos;
         }
+        m_gameState->explodedPoints.remove(nextPos);
         (*m_gameMatrix)[nextPos.x][nextPos.y] = snake.id;
         return;
     }
@@ -69,6 +71,8 @@ void Game::handleSnakeStep(data::Snake& snake)
     }
     data::Snake& collissionSnake = m_gameState->snakes[collissionSnakeId];
     bool isFrontalCollision = collissionSnake.points.last() != nextPos;
+
+    m_explosionGenerator->explode(m_field, nextPos, isFrontalCollision);
 
     if (isFrontalCollision) {
         collissionSnake.isAlive = false;
@@ -113,6 +117,17 @@ void Game::doStep()
 
         m_finishingGameTimer->start(msecToProceed);
     }
+
+
+    QSet<data::Point> explodedPoints = m_explosionGenerator->getExplodedPoints();
+    QSet<data::Point>::const_iterator it2 = explodedPoints.constBegin();
+    while (it2 != explodedPoints.constEnd()) {
+        // TODO if contains snake head...
+        (*m_gameMatrix)[it2->x][it2->y] = EMPTY;
+        ++it2;
+    }
+
+    m_gameState->explodedPoints.unite(explodedPoints);
 
     fireGameStateChanged();
 }

@@ -4,7 +4,6 @@
 #include "data.h"
 #include "snake.h"
 #include "field.h"
-#include "explosion.h"
 #include <QMap>
 #include <QSet>
 
@@ -20,7 +19,7 @@ namespace data {
 struct GameState {
     // id -> snake
     QMap<uint, Snake> snakes;
-    QSet<Explosion> explosions;
+    QSet<Point> explodedPoints;
     Status status;
 };
 

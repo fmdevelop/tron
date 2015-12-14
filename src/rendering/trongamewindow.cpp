@@ -63,11 +63,26 @@ void TronGameWindow::render()
     }
 
     if (m_pGameState->status == tron::data::RUNNING || m_pGameState->status == tron::data::ROUND_FINISHING) {
-        QMap<uint, data::Snake>::const_iterator iterator = m_pGameState->snakes.constBegin();
-        while (iterator != m_pGameState->snakes.constEnd()) {
-            renderLastSegmentOfSnake(*iterator);
-            ++iterator;
+        QMap<uint, data::Snake>::const_iterator it = m_pGameState->snakes.constBegin();
+        while (it != m_pGameState->snakes.constEnd()) {
+            renderLastSegmentOfSnake(*it);
+            ++it;
         }
+
+
+        glBegin(GL_POINTS);
+        glColor3f(m_pField->explosionColor.redF(),
+                  m_pField->explosionColor.greenF(),
+                  m_pField->explosionColor.blueF());
+
+        QSet<data::Point>::const_iterator it2 = m_pGameState->explodedPoints.constBegin();
+        while (it2 != m_pGameState->explodedPoints.constEnd()) {
+            glVertex2i(it2->x, it2->y);
+            ++it2;
+        }
+        glEnd();
+
+
         return;
     }
 

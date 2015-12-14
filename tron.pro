@@ -19,13 +19,15 @@ SOURCES += src/main.cpp\
     src/rendering/openglwindow.cpp \
     src/mainwindow.cpp \
     src/rendering/trongamewindow.cpp \
-    src/rendering/trongamewidget.cpp
+    src/rendering/trongamewidget.cpp \
+    src/data/data.cpp \
+    src/gameplay/explosiongenerator.cpp \
+    src/utilities.cpp
 
 HEADERS  += \
     src/data/data.h \
     src/data/field.h \
     src/data/border.h \
-    src/data/explosion.h \
     src/data/snake.h \
     src/data/gamestate.h \
     src/constants.h \
@@ -35,7 +37,9 @@ HEADERS  += \
     src/rendering/openglwindow.h \
     src/mainwindow.h \
     src/rendering/trongamewindow.h \
-    src/rendering/trongamewidget.h
+    src/rendering/trongamewidget.h \
+    src/gameplay/explosiongenerator.h \
+    src/utilities.h
 
 FORMS    += \
     src/mainwindow.ui

@@ -6,6 +6,7 @@
 #include "../data/snake.h"
 #include "../data/initobject.h"
 #include "initialgamestategenerator.h"
+#include "explosiongenerator.h"
 #include <QObject>
 #include <QTimer>
 #include <QScopedPointer>
@@ -51,6 +52,7 @@ private:
     QTimer* m_gameIntervalTimer;
 
     InitialGameStateGenerator* m_initialGameStateGenerator;
+    QScopedPointer<ExplosionGenerator> m_explosionGenerator;
 
     void fireGameStateChanged();
     void fillGameMatrix();
