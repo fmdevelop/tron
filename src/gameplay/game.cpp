@@ -65,22 +65,29 @@ void Game::handleSnakeStep(data::Snake& snake)
 
     // COLLISSION WITH OTHER SNAKE
     uint collissionSnakeId = static_cast<uint>(obstacle);
+
+    bool isFrontalCollision = false;
+
     if (collissionSnakeId == snake.id) {
-       // no points for user --> OR -1 ?
-       return;
+       // Collission with himself... --> no points
+    } else {
+        data::Snake& collissionSnake = m_gameState->snakes[collissionSnakeId];
+        isFrontalCollision = collissionSnake.points.last() != nextPos
+                && collissionSnake.getNextPosition() == snake.points.last();
+
+        snake.score += isFrontalCollision
+                            ? SCORE_COLLISSION
+                            : SCORE_KILL;
+
+        if (isFrontalCollision) {
+            // OPTIMIZATION: kill the other snake immediatly and give her points
+            // so the handleSnakeStep won't be call for the other snake.
+            collissionSnake.isAlive = false;
+            collissionSnake.score += SCORE_COLLISSION;
+        }
     }
-    data::Snake& collissionSnake = m_gameState->snakes[collissionSnakeId];
-    bool isFrontalCollision = collissionSnake.points.last() != nextPos;
 
     m_explosionGenerator->explode(m_field, nextPos, isFrontalCollision);
-
-    if (isFrontalCollision) {
-        collissionSnake.isAlive = false;
-        collissionSnake.score += SCORE_COLLISSION;
-        snake.score += SCORE_COLLISSION;
-    } else {
-        collissionSnake.score += SCORE_KILL;
-    }
 }
 
 void Game::doStep()

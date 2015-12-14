@@ -1,6 +1,8 @@
 #ifndef TRONGAMEWINDOW_H
 #define TRONGAMEWINDOW_H
 
+
+// TODO proper includes everywhere!!!
 #include <QObject>
 #include <QOpenGLShaderProgram>
 #include "openglwindow.h"
@@ -9,6 +11,7 @@
 #include "../data/gamestate.h"
 #include "../data/snake.h"
 #include <QColor>
+#include "text.h"
 
 
 namespace tron {
@@ -29,6 +32,7 @@ public slots:
 private:
     const tron::data::Field* m_pField;
     const tron::data::GameState* m_pGameState;
+    tron::rendering::Text m_textRenderer;
 
     void drawBorder(const tron::data::Border& border);
     void renderSnakeName(const tron::data::Snake& snake);

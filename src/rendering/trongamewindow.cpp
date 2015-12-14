@@ -1,11 +1,13 @@
 #include "trongamewindow.h"
 #include <QScreen>
 #include "../data/data.h"
+#include <QFont>
 
 using namespace tron::rendering;
 
 TronGameWindow::TronGameWindow(const data::Field *field)
     : m_pField(field)
+    , m_textRenderer(QFont("Lucida Console", 11))
 {
     Q_ASSERT_X(m_pField != NULL, "TronGameWindow", "field NULL");
     QSize fixedSize (m_pField->width, m_pField->height);
@@ -121,7 +123,10 @@ void TronGameWindow::drawBorder(const tron::data::Border &border)
 
 void TronGameWindow::renderSnakeName(const tron::data::Snake &snake)
 {
-
+    glColor3f(snake.color.redF(),
+              snake.color.greenF(),
+              snake.color.blueF());
+    m_textRenderer.renderText(snake.points.first().x, snake.points.first().y - 20, snake.name);
 }
 
 void TronGameWindow::renderLastSegmentOfSnake(const tron::data::Snake &snake)
