@@ -43,6 +43,9 @@ void TronGameWindow::initialize()
                  m_pField->backgroundColor.alphaF());
     glClearDepth( 1.0f);
 
+    // TODO...
+    glDisable(GL_BLEND);
+
     drawCleanField();
 }
 
@@ -50,7 +53,7 @@ void TronGameWindow::render()
 {
     glMatrixMode(GL_MODELVIEW);
 
-    if (m_pGameState == NULL)
+    if (m_pGameState.isNull())
         return;
 
     if (m_pGameState->status == tron::data::ROUND_ABOUT_TO_START) {
@@ -87,23 +90,19 @@ void TronGameWindow::render()
 
         return;
     }
-
-        /*
-    glLineWidth(1);
-    glColor3f(1.0, 0.0, 0.0);
-
-    glBegin(GL_LINES);
-    glVertex2i(0, 0);
-    glVertex2i(width(), height());
-    glEnd();*/
-
-
 }
 
-void TronGameWindow::on_gamestateChanged(const tron::data::GameState *newGameState)
+//#include <QDebug>
+void TronGameWindow::on_gamestateChanged(QSharedPointer<data::GameState> newGameState)
 {
+    //qDebug() << "game state changed!!!";
     m_pGameState = newGameState;
     this->requestUpdate();
+}
+
+void TronGameWindow::keyPressEvent(QKeyEvent *event)
+{
+    emit keyPressed(event);
 }
 
 void TronGameWindow::drawBorder(const tron::data::Border &border)

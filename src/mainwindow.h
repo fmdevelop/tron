@@ -22,15 +22,22 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+signals:
+    void gameStart(const tron::data::InitObject&);
+
+protected:
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+
 private slots:
     void on_pb_startGame_clicked();
     void on_gameFieldInitialized(const data::Field* field);
+    void on_keyPressed(QKeyEvent *event);
 
 private:
     Ui::MainWindow *ui;
 
     QScopedPointer<gameplay::InitialGameStateGenerator> m_pInitialGameStateGenerator;
-    gameplay::Game* m_pGame;
+    QScopedPointer<gameplay::Game> m_pGame;
     QScopedPointer<rendering::TronGameWindow> m_pGameWindow;
 };
 }

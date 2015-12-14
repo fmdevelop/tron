@@ -34,15 +34,14 @@ data::GameState *InitialGameStateGenerator::createInitialGameState(const data::I
 
     Q_ASSERT_X(initObject.snakeNames.count() <= 8, "createInitialGameState", "Too many snakes, no more colors defined");
 
-    uint nextSnakeId = 0;
 
-    QSet<QString>::const_iterator iterator = initObject.snakeNames.constBegin();
+    QMap<uint, QString>::const_iterator iterator = initObject.snakeNames.constBegin();
     while (iterator != initObject.snakeNames.constEnd()) {
-        uint snakeId = nextSnakeId++;
-        gameState->snakes[snakeId].id = snakeId;
-        gameState->snakes[snakeId].name = *iterator;
-        gameState->snakes[snakeId].color = tron::STANDARD_SNAKE_COLORS[snakeId];
-        gameState->snakes[snakeId].score = 0;
+        Q_ASSERT_X(iterator.key() < 8, "createInitialGameState", "too high snake id, no more colors");
+        gameState->snakes[iterator.key()].id = iterator.key();
+        gameState->snakes[iterator.key()].name = iterator.value();
+        gameState->snakes[iterator.key()].color = tron::STANDARD_SNAKE_COLORS[iterator.key()];
+        gameState->snakes[iterator.key()].score = 0;
         ++iterator;
     }
 

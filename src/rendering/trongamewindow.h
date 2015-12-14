@@ -11,6 +11,7 @@
 #include "../data/gamestate.h"
 #include "../data/snake.h"
 #include <QColor>
+#include <QSharedPointer>
 #include "text.h"
 
 
@@ -26,12 +27,18 @@ public:
     void initialize() Q_DECL_OVERRIDE;
     void render() Q_DECL_OVERRIDE;
 
+signals:
+    void keyPressed(QKeyEvent *event);
+
 public slots:
-    void on_gamestateChanged(const data::GameState*newGameState);
+    void on_gamestateChanged(QSharedPointer<data::GameState> newGameState);
+
+protected:
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 private:
     const tron::data::Field* m_pField;
-    const tron::data::GameState* m_pGameState;
+    QSharedPointer<data::GameState> m_pGameState;
     tron::rendering::Text m_textRenderer;
 
     void drawBorder(const tron::data::Border& border);

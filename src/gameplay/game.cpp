@@ -10,14 +10,23 @@ Game::Game(InitialGameStateGenerator *initialGameStateGenerator, QObject *parent
   , m_startGameTimer(new QTimer(this))
   , m_finishingGameTimer(new QTimer(this))
   , m_gameIntervalTimer(new QTimer(this))
+  , m_showingScoreTimer(new QTimer(this))
   , m_initialGameStateGenerator(initialGameStateGenerator)
 {
+    moveToThread(&m_thread);
     m_explosionGenerator.reset(new ExplosionGenerator());
     m_gameIntervalTimer->setInterval(tron::MSEC_GAME_INTERVAL);
     connect(m_startGameTimer, SIGNAL(timeout()), m_gameIntervalTimer, SLOT(start()));
     connect(m_gameIntervalTimer, SIGNAL(timeout()), this, SLOT(doStep()));
     connect(m_finishingGameTimer, SIGNAL(timeout()), m_gameIntervalTimer, SLOT(stop()));
     connect(m_finishingGameTimer, SIGNAL(timeout()), this, SLOT(roundFinished()));
+    m_thread.start();
+}
+
+Game::~Game()
+{
+    m_thread.quit();
+    m_thread.wait();
 }
 
 void Game::changeDirection(uint id, data::DirectionChange::DirectionChange directionChange)
@@ -25,14 +34,31 @@ void Game::changeDirection(uint id, data::DirectionChange::DirectionChange direc
     Q_ASSERT_X(m_gameState != NULL, "changeDirection", "private game state NULL");
     Q_ASSERT_X(m_gameState->snakes.contains(id), "changeDirection", "unknown snake name");
 
+    if (m_gameState->status != tron::data::RUNNING && m_gameState->status != tron::data::ROUND_FINISHING)
+        return;
+
     data::Snake& snake = m_gameState->snakes[id];
 
     // TODO proper locking... QMutexLocker locker(&snake.mutex());
-    snake.direction = static_cast<data::Direction::Direction>((snake.direction + directionChange) % 4);
+    QMutexLocker locker(&m_mutexes[id]);
+    snake.direction = static_cast<data::Direction::Direction>((snake.direction + directionChange+4)% 4);
+}
+
+void Game::continueWithNextRound()
+{
+    if (m_gameState->status != tron::data::SHOWING_RESULTS)
+        return;
+
+    if (m_showingScoreTimer->isActive()) {
+        m_waitAfterShowingScore = false;
+    } else {
+        startRound();
+    }
 }
 
 void Game::handleSnakeStep(data::Snake& snake)
 {
+    QMutexLocker locker(&m_mutexes[snake.id]);
     data::Point nextPos = snake.getNextPosition();
 
     if (nextPos.x < 0 || nextPos.y < 0
@@ -60,8 +86,10 @@ void Game::handleSnakeStep(data::Snake& snake)
     // COLLISSION
     snake.isAlive = false;
 
-    if (obstacle == BORDER)
+    if (obstacle == BORDER) {
+        m_explosionGenerator->explode(m_field, nextPos, false);
         return; // no points
+    }
 
     // COLLISSION WITH OTHER SNAKE
     uint collissionSnakeId = static_cast<uint>(obstacle);
@@ -154,6 +182,8 @@ void Game::roundFinished()
 
     m_gameState->status = data::SHOWING_RESULTS;
     fireGameStateChanged();
+    m_waitAfterShowingScore = true;
+    m_showingScoreTimer->start(tron::MSEC_MIN_SHOWING_SCORE);
 }
 
 void Game::startRound()
@@ -167,9 +197,15 @@ void Game::startRound()
     m_startGameTimer->start(tron::MSEC_TO_START);
 }
 
+void Game::showingScoreTimerFinished()
+{
+    if (!m_waitAfterShowingScore)
+        startRound();
+}
+
 void Game::fireGameStateChanged()
 {
-    emit gamestateChanged(m_gameState.data());
+    emit gamestateChanged(m_gameState);
 }
 
 void Game::fillGameMatrix()
@@ -194,9 +230,9 @@ void Game::fillGameMatrix()
         Q_ASSERT_X(start.x == end.x || start.y == end.y, "fillGameMatrix", "Invalid start points for a snake");
 
         if (start.x == end.x) {
-            fillGameMatrixRow(start.x, start.y, end.y, id);
+            fillGameMatrixColumn(start.x, start.y, end.y, id);
         } else {
-            fillGameMatrixColumn(start.y, start.x, end.x, id);
+            fillGameMatrixRow(start.y, start.x, end.x, id);
         }
 
         ++iterator;
@@ -223,7 +259,7 @@ void Game::fillGameMatrixColumn(uint column, uint from, uint to, int value)
 }
 
 
-void Game::startGame(const data::InitObject &initObjectgameState) {
+void Game::startGame(const tron::data::InitObject &initObjectgameState) {
     Q_ASSERT_X(initObjectgameState.snakeNames.count() > 0, "startGame", "No snakes to start a game");
     Q_ASSERT_X(initObjectgameState.fieldSize.width() > 0, "startGame", "Invalid field width");
     Q_ASSERT_X(initObjectgameState.fieldSize.height() > 0, "startGame", "Invalid field height");
