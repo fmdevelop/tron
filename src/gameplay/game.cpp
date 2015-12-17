@@ -71,7 +71,7 @@ void Game::handleSnakeStep(data::Snake& snake)
             || nextPos.y >= m_field.height) {
         // ESCAPE
         snake.isAlive = false;
-        snake.score += SCORE_ESCAPE;
+        ++snake.score.numberOfEscapes;
         return;
     }
 
@@ -105,18 +105,18 @@ void Game::handleSnakeStep(data::Snake& snake)
        // Collission with himself... --> no points
     } else {
         data::Snake& collissionSnake = m_gameState->snakes[collissionSnakeId];
-        isFrontalCollision = collissionSnake.points.last() != nextPos
+        isFrontalCollision = collissionSnake.points.last() == nextPos
                 && collissionSnake.getNextPosition() == snake.points.last();
-
-        snake.score += isFrontalCollision
-                            ? SCORE_COLLISSION
-                            : SCORE_KILL;
 
         if (isFrontalCollision) {
             // OPTIMIZATION: kill the other snake immediatly and give her points
             // so the handleSnakeStep won't be call for the other snake.
             collissionSnake.isAlive = false;
-            collissionSnake.score += SCORE_COLLISSION;
+            ++snake.score.numberOfCollissions;
+            ++collissionSnake.score.numberOfCollissions;
+        } else {
+            if (collissionSnake.isAlive)
+                ++collissionSnake.score.numberOfKills;
         }
     }
 
@@ -181,7 +181,7 @@ void Game::roundFinished()
 
     while (iterator != m_gameState->snakes.end()) {
         if (iterator->isAlive) {
-            iterator->score += SCORE_SURVIVAL;
+            ++iterator->score.numberOfSurvivals;
             // there should be only one
             break;
         }

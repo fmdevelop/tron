@@ -2,6 +2,7 @@
 #define PATH_H
 
 #include "data.h"
+#include "score.h"
 #include <QColor>
 #include <QList>
 #include <QString>
@@ -17,7 +18,7 @@ struct Snake
     QColor color;
     QList<Point> points;
     Direction::Direction direction;
-    uint score;
+    Score score;
     bool isAlive;
 
     /**

@@ -36,7 +36,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 void MainWindow::on_pb_startGame_clicked()
 {
     tron::data::InitObject initObject;
-    initObject.fieldSize = QSize(1024, 768),
+    initObject.fieldSize = QSize(1240, 680),
     initObject.snakeNames[0] = "Master of Desaster";
     initObject.snakeNames[1] = "Evergreen";
     initObject.snakeNames[2] = "Pompino";

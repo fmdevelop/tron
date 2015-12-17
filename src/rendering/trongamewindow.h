@@ -45,6 +45,12 @@ private:
     void renderSnakeName(const tron::data::Snake& snake);
     void renderLastSegmentOfSnake(const tron::data::Snake& snake);
     void drawCleanField();
+    void drawExplodedPoints();
+
+    static const QColor SCORE_SCREEN_BG_COLOR;
+    static const QColor SCORE_SCREEN_FONT_COLOR;
+    void renderScoreScreenBackground();
+    void renderScoreScreenContent(QMap<uint, data::Snake>::const_iterator it);
 };
 
 }

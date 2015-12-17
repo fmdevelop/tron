@@ -51,6 +51,8 @@ struct TextPrivate
 TextPrivate::TextPrivate(const QFont &f)
     : font(f), fontMetrics(f), xOffset(0), yOffset(0)
 {
+    font.setPixelSize(14);
+    font.setBold(true);
 }
 
 TextPrivate::~TextPrivate()
@@ -154,7 +156,7 @@ QFontMetrics Text::fontMetrics() const
 }
 
 //! Renders text at given x, y.
-void Text::renderText(float x, float y, const QString &text)
+void Text::renderText(float x, float y, const QString &text, bool alignCenter)
 {
     glPushAttrib(GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TEXTURE_BIT);
     glPushMatrix();
@@ -165,15 +167,20 @@ void Text::renderText(float x, float y, const QString &text)
 
     GLuint texture = 0;
 
-    uint width = 0;
-    for (int i = 0; i < text.length(); ++i)
-    {
-        // chached internally
-        width += d->createCharacter(text[i]).width;
+    float xposition = x;
+
+    if (alignCenter) {
+        uint width = 0;
+        for (int i = 0; i < text.length(); ++i)
+        {
+            // chached internally
+            width += d->createCharacter(text[i]).width;
+        }
+        xposition -= width/2;
     }
 
     // align center
-    glTranslatef(x-width/2, y, 0);
+    glTranslatef(xposition, y, 0);
 
     for (int i = 0; i < text.length(); ++i) {
         CharData &c = d->createCharacter(text[i]);

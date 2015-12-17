@@ -39,7 +39,8 @@ HEADERS  += \
     src/rendering/trongamewindow.h \
     src/gameplay/explosiongenerator.h \
     src/utilities.h \
-    src/rendering/text.h
+    src/rendering/text.h \
+    src/data/score.h
 
 FORMS    += \
     src/mainwindow.ui

@@ -41,7 +41,10 @@ data::GameState *InitialGameStateGenerator::createInitialGameState(const data::I
         gameState->snakes[iterator.key()].id = iterator.key();
         gameState->snakes[iterator.key()].name = iterator.value();
         gameState->snakes[iterator.key()].color = tron::STANDARD_SNAKE_COLORS[iterator.key()];
-        gameState->snakes[iterator.key()].score = 0;
+        gameState->snakes[iterator.key()].score.numberOfCollissions = 0;
+        gameState->snakes[iterator.key()].score.numberOfEscapes = 0;
+        gameState->snakes[iterator.key()].score.numberOfKills= 0;
+        gameState->snakes[iterator.key()].score.numberOfSurvivals= 0;
         ++iterator;
     }
 

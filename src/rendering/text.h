@@ -25,7 +25,7 @@ public:
     QFont font() const;
     QFontMetrics fontMetrics() const;
 
-    void renderText(float x, float y, const QString &text);
+    void renderText(float x, float y, const QString &text, bool alignCenter = true);
 
 
 private:
