@@ -27,7 +27,7 @@ const uint SCORE_COLLISSION = 1;
 extern const QColor STANDARD_SNAKE_COLORS[];
 const QColor BORDER_COLOR(Qt::darkGray);
 const QColor BACKGROUND_COLOR(Qt::black);
-const QColor EXPLOSION_COLOR(Qt::magenta);
+const QColor EXPLOSION_COLOR(Qt::black);
 
 
 }

@@ -11,12 +11,16 @@ ExplosionGenerator::ExplosionGenerator()
 
 }
 
-void ExplosionGenerator::explode(const data::Field& field, const tron::data::Point &origin, bool wasFrontalCollision)
+void ExplosionGenerator::explode(const data::Field& field, const tron::data::Point &origin, bool wasFrontalCollision, int secondsGameRunning)
 {
-    const int minRadius = tron::EXPLOSION_RADIUS_MIN;
-    const int maxRadius = wasFrontalCollision
-                                ? tron::EXPLOSION_RADIUS_FRONTAL_COLLISION_MAX
-                                : tron::EXPLOSION_RADIUS_MAX;
+    int minRadius = tron::EXPLOSION_RADIUS_MIN;
+    int maxRadius = wasFrontalCollision
+                        ? tron::EXPLOSION_RADIUS_FRONTAL_COLLISION_MAX
+                        : tron::EXPLOSION_RADIUS_MAX;
+
+    // duplicate every 15 seconds
+    minRadius += minRadius*secondsGameRunning/15;
+    maxRadius += maxRadius*secondsGameRunning/15;
 
     const int radius = generateRandomIntInRange(minRadius, maxRadius);
 
@@ -56,6 +60,11 @@ QSet<tron::data::Point> ExplosionGenerator::getExplodedPoints()
     return m_explodingPoints.isEmpty()
               ? QSet<tron::data::Point>()
               : m_explodingPoints.dequeue();
+}
+
+void ExplosionGenerator::clear()
+{
+    m_explodingPoints.clear();
 }
 
 void ExplosionGenerator::addPoint(int step, const tron::data::Point &point)

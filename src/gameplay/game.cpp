@@ -92,7 +92,7 @@ void Game::handleSnakeStep(data::Snake& snake)
     snake.isAlive = false;
 
     if (obstacle == BORDER) {
-        m_explosionGenerator->explode(m_field, nextPos, false);
+        m_explosionGenerator->explode(m_field, nextPos, false, m_roundStarted.elapsed()/1000);
         return; // no points
     }
 
@@ -120,7 +120,7 @@ void Game::handleSnakeStep(data::Snake& snake)
         }
     }
 
-    m_explosionGenerator->explode(m_field, nextPos, isFrontalCollision);
+    m_explosionGenerator->explode(m_field, nextPos, isFrontalCollision, m_roundStarted.elapsed()/1000);
 }
 
 void Game::doStep()
@@ -198,6 +198,7 @@ void Game::roundFinished()
 void Game::startRound()
 {
     m_initialGameStateGenerator->cleanupGameStateForNewRound(m_gameState.data(), m_field);
+    m_explosionGenerator->clear();
 
     qDebug() << "Changing game state to ROUND_ABOUT_TO_START in startRound()";
     m_gameState->status = data::ROUND_ABOUT_TO_START;
@@ -207,6 +208,8 @@ void Game::startRound()
     fireGameStateChanged();
 
     m_startGameTimer->start(tron::MSEC_TO_START);
+
+    m_roundStarted.start();
 }
 
 void Game::showingScoreTimerFinished()
@@ -260,13 +263,17 @@ void Game::fillGameMatrix()
 
 void Game::fillGameMatrixRow(uint row, uint from, uint to, int value)
 {
-    for (uint x = from; x <= to; ++x)
+    uint x1 = qMin(from, to);
+    uint x2 = qMax(from, to);
+    for (uint x = x1; x <= x2; ++x)
         (*m_gameMatrix)[x][row] = value;
 }
 
 void Game::fillGameMatrixColumn(uint column, uint from, uint to, int value)
 {
-    for (uint y = from; y <= to; ++y)
+    uint y1 = qMin(from, to);
+    uint y2 = qMax(from, to);
+    for (uint y = y1; y <= y2; ++y)
         (*m_gameMatrix)[column][y] = value;
 }
 

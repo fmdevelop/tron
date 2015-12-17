@@ -14,6 +14,7 @@
 #include <QVector>
 #include <QMutex>
 #include <QThread>
+#include <QTime>
 
 namespace tron {
 namespace gameplay {
@@ -62,6 +63,7 @@ private:
     QTimer* m_finishingGameTimer;
     QTimer* m_gameIntervalTimer;
     QTimer* m_showingScoreTimer;
+    QTime m_roundStarted;
 
     bool m_waitAfterShowingScore;
 

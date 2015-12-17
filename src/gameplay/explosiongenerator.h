@@ -15,8 +15,10 @@ class ExplosionGenerator
 public:
     ExplosionGenerator();
 
-    void explode(const data::Field& field, const data::Point& point, bool wasFrontalCollision);
+    void explode(const data::Field& field, const data::Point& point, bool wasFrontalCollision, int secondsGameRunning);
     QSet<data::Point> getExplodedPoints();
+
+    void clear();
 
 private:
     QQueue<QSet<data::Point> > m_explodingPoints;
