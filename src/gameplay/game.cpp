@@ -134,6 +134,7 @@ void Game::doStep()
 
     int snakesAlive = 0;
 
+    QSet<data::Point> snakeHeads;
     while (iterator != m_gameState->snakes.end()) {
         if (!iterator->isAlive) {
             ++iterator;
@@ -144,11 +145,13 @@ void Game::doStep()
 
         handleSnakeStep(*iterator);
 
+        snakeHeads.insert(iterator->points.last());
+
         ++iterator;
     }
 
     if (m_gameState->status == data::RUNNING && snakesAlive <= 1) {
-        qDebug() << "Changing gamestate to ROUND_FINISHING in doStep() cause no more snake is alive";
+        qDebug() << "Changing gamestate to ROUND_FINISHING in doStep() cause no more snakes are alive";
         m_gameState->status = data::ROUND_FINISHING;
 
         uint msecToProceed = tron::MSEC_TO_FINISH_ONE_PLAYER_ALIVE;
@@ -165,7 +168,12 @@ void Game::doStep()
     QSet<data::Point> explodedPoints = m_explosionGenerator->getExplodedPoints();
     QSet<data::Point>::const_iterator it2 = explodedPoints.constBegin();
     while (it2 != explodedPoints.constEnd()) {
-        // TODO if contains snake head...
+        // TODO intersecting the two sets would be more efficient
+        if (snakeHeads.contains(*it2)) {
+            uint snakeId = static_cast<uint>((*m_gameMatrix)[it2->x][it2->y]);
+            m_gameState->snakes[snakeId].isAlive = false;
+        }
+
         (*m_gameMatrix)[it2->x][it2->y] = EMPTY;
         ++it2;
     }
